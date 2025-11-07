@@ -1,23 +1,28 @@
 # Deep Q-Learning for Atari Bank Heist
 
-A comprehensive implementation of Deep Q-Network (DQN) reinforcement learning agent for the Atari game Bank Heist, including systematic hyperparameter experimentation and analysis.
+An end-to-end Deep Q-Network (DQN) implementation that learns to play the Atari game Bank Heist from raw pixels. This project explores how tuning key hyperparameters (α, γ, ε) impacts learning stability, exploration, and long-term performance.
 
 ## Project Overview
 
-This project implements and evaluates a Deep Q-Learning agent for Bank Heist, exploring how different hyperparameters affect learning efficiency. Through systematic experimentation across 2,700 training episodes, I identified optimal configurations that improved learning rate by 158% compared to baseline.
+A convolutional DQN agent was trained for ~2,900 episodes using the Gymnasium ALE environment.
+Systematic experiments on learning rate, discount factor, exploration decay, and policy type reveal how subtle parameter changes reshape the agent’s behavior.
 
-## Key Results
+**Result:** The agent evolved from random movement to efficient, goal-directed navigation — learning to rob banks while avoiding capture through trial and error.
 
-| Configuration | Episodes | Avg Score | Improvement |
-|---------------|----------|-----------|-------------|
-| **Baseline** | 1000 | 493.0 | Reference |
-| Baseline (400 eps) | 400 | 27.9 | Early baseline |
-| **Exp 1: Higher Alpha** | 400 | 8.8 | -68% (Failed) |
-| **Exp 2: Lower Gamma** | 400 | 23.0 | -18% (Worse) |
-| **Exp 3: Slower Epsilon** | 400 | **71.9** | **+158% (Good)** |
-| **Exp 4: Boltzmann Policy** | 500 | 38.7 | +39% (Moderate) |
+![Training Results](results/BankHeist_Final_Results.png)  
+*Figure 1 — Training progress and hyperparameter comparison.*
 
-### Key Finding
+## Key Findings
+
+| Experiment | Configuration | Avg Reward | Observation |
+|-------------|---------------|-------------|--------------|
+| **Baseline** | α=0.00025, γ=0.99, ε-decay=0.995 | **483.3** | Stable convergence |
+| ↑ Learning Rate | α=0.0005 | 8.8 | Diverged — unstable Q-values |
+| ↓ Discount Factor | γ=0.95 | 23.0 | Myopic, short-sighted policy |
+| ↓ Epsilon Decay | decay=0.99 | **71.9 (+158%)** | Best early-stage learning |
+| Boltzmann Policy | Softmax w/ T-decay=0.995 | 38.7 | Moderate gain, unstable |
+
+### Insights
 **Slower epsilon decay (0.99 vs 0.995) achieved 2.6x better learning efficiency**, demonstrating that extended exploration significantly improves early-stage performance in complex navigation tasks.
 
 ## Architecture
@@ -37,6 +42,27 @@ This project implements and evaluates a Deep Q-Learning agent for Bank Heist, ex
 - **Target Network:** Updated every 10 episodes
 - **Batch Size:** 32 experiences
 - **Optimizer:** Adam with learning rate 0.00025
+
+## Training Details
+
+### Environment Details
+- **Game:** Bank Heist (ALE/BankHeist-v5)
+- **State Space:** Continuous (84×84×4 stacked frames)
+- **Action Space:** Discrete (18 actions)
+- **Reward Structure:** Native game scoring (points for robbing banks)
+
+### Baseline Configuration
+```python
+total_episodes = 1000
+max_steps = 2000
+learning_rate = 0.00025  # Alpha in Bellman equation
+gamma = 0.99             # Discount factor
+epsilon_start = 1.0
+epsilon_min = 0.01
+epsilon_decay = 0.995
+batch_size = 32
+memory_size = 30000
+```
 
 ## Experiments Conducted
 
@@ -64,27 +90,6 @@ This project implements and evaluates a Deep Q-Learning agent for Bank Heist, ex
 - **Result:** Moderate (38.7 avg) - 39% improvement
 - **Conclusion:** ε-greedy better suited for discrete action spaces
 
-## 📈 Training Details
-
-### Baseline Configuration
-```python
-total_episodes = 1000
-max_steps = 2000
-learning_rate = 0.00025  # Alpha in Bellman equation
-gamma = 0.99             # Discount factor
-epsilon_start = 1.0
-epsilon_min = 0.01
-epsilon_decay = 0.995
-batch_size = 32
-memory_size = 30000
-```
-
-### Environment Details
-- **Game:** Bank Heist (ALE/BankHeist-v5)
-- **State Space:** Continuous (84×84×4 stacked frames)
-- **Action Space:** Discrete (18 actions)
-- **Reward Structure:** Native game scoring (points for robbing banks)
-
 ## Key Learnings
 
 ### Technical Insights
@@ -92,9 +97,3 @@ memory_size = 30000
 2. **Learning rate stability matters** - 2x increase caused complete failure
 3. **Future planning required** - Lower gamma hurt navigation tasks
 4. **Policy selection important** - ε-greedy outperformed Boltzmann for discrete actions
-
-### Libraries Used
-- PyTorch for neural networks
-- Gymnasium/ALE for Atari environments
-- OpenCV for image processing
-- NumPy for numerical operations
