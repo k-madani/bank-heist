@@ -97,3 +97,8 @@ memory_size = 30000
 2. **Learning rate stability matters** - 2x increase caused complete failure
 3. **Future planning required** - Lower gamma hurt navigation tasks
 4. **Policy selection important** - ε-greedy outperformed Boltzmann for discrete actions
+
+## Notebooks
+1. Baseline & Higher alpha experiment: https://colab.research.google.com/drive/1HZHGA9DPFu-XDfd1luFaqAAY8SqgdoUn?usp=sharing
+2. Slower Epsilon Decay: https://colab.research.google.com/drive/1rXsCCvX114OfAk45ILNwa1661bPI6IdT?usp=sharing
+3. Boltzmann Policy & Lower Gamma: https://colab.research.google.com/drive/1X9AxePKIvkI9EmR2n3rbjYzraXNI5S0k?usp=sharing
